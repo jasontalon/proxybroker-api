@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const express = require("express"),
 	app = express(),
-	port = process.env.PORT || 3000,
+	port = process.env.PORT || 8080,
 	CronJob = require("cron").CronJob,
 	{ filterProxyIp } = require("./proxy"),
 	{ saveProxyIp, fetchProxyIp } = require("./db"),
