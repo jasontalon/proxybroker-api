@@ -4,7 +4,7 @@ RUN pip install proxybroker
 
 WORKDIR /usr/src/app
 
-COPY package.json /usr/src/app
+COPY package*.json ./
 
 RUN npm install
 
