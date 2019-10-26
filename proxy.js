@@ -1,6 +1,6 @@
 const { exec } = require("child_process"),
 	path = require("path"),
-	proxyBrokerDirectory = process.env.PROXYBROKER_DIRECTORY;
+	proxyBrokerDirectory = process.env.PROXYBROKER_DIRECTORY || ""
 
 const extractIpAddress = output => (output.match(/(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+/gm) || []).pop(),
  splitIpAndPort = ipPort => {
@@ -29,7 +29,6 @@ const extractIpAddress = output => (output.match(/(([0-9]|[1-9][0-9]|1[0-9]{2}|2
 module.exports = {
 	filterProxyIp: async (countries = "US", limit = 10) => {
 		return new Promise((resolve, reject) => {
-			if (!proxyBrokerDirectory) throw "PROXYBROKER_DIRECTORY not specified.";
 			exec(`${path.join(proxyBrokerDirectory,"proxybroker")} find --types HTTP HTTPS --countries ${countries} -l ${limit}`,
 				(error, stdout, stderr) =>
 					proxyBrokerResponse(
