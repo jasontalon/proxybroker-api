@@ -21,7 +21,7 @@ module.exports = {
 	},
 
 	fetchProxyIp: async () => {
-		const query = "query { proxy(limit: 10, order_by: {updated_at: desc}) { ip port updated_at } }",
+		const query = "query { proxy(limit: 10, order_by: {updated_at: desc}) { ip port, type, updated_at } }",
 			{
 				data: { data: { proxy = [] } = {}, errors }
 			} = await axios.post(endpoint, { query }, { headers });
