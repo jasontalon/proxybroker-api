@@ -18,8 +18,7 @@
 			"args": ["--runInBand", "--verbose"],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen",
-			"disableOptimisticBPs": true
+			"internalConsoleOptions": "neverOpen"
 		},
 		{
 			"type": "node",
@@ -29,8 +28,7 @@
 			"args": ["${fileBasenameNoExtension}", "--runInBand", "--verbose"],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen",
-			"disableOptimisticBPs": true
+			"internalConsoleOptions": "neverOpen"
 		}
 	]
 }
