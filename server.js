@@ -4,22 +4,29 @@ const express = require("express"),
 	app = express(),
 	port = process.env.PORT || 8080,
 	CronJob = require("cron").CronJob,
-	{ filterProxyIp } = require("./proxy"),
-	{ saveProxyIp, fetchProxyIp } = require("./db"),
-	filterProxyIpJob = new CronJob("0 */1 * * * *", filterProxyCommand); //runs every minute
+	{ findProxy } = require("./proxy.find"),
+	findProxyJob = new CronJob("0 */1 * * * *", findProxyCommand); //runs every minute
 
 app.set("json spaces", 2);
 
+let lastRunAt = "",
+	proxies = [];
+	
 app.get("/", async function(req, res) {
-	res.jsonp(await fetchProxyIp());
+	res.jsonp({ lastRunAt, proxies });
+});
+
+app.get("/refresh", async function(req, res) {
+	await findProxyCommand();
+	res.jsonp({ lastRunAt, proxies });
 });
 
 app.listen(port, () => {
 	console.log(`listening to port ${port}`);
-	filterProxyIpJob.start();
+	findProxyJob.start();
 });
 
-async function filterProxyCommand() {
-	const affectedRows = await saveProxyIp(await filterProxyIp());
-	console.log(`${new Date()} - ${affectedRows} rows updated.`);
+async function findProxyCommand() {
+	proxies = await findProxy();
+	lastRunAt = new Date();
 }
