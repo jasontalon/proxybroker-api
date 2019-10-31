@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const { findProxy } = require("./proxy.find");
 
 describe("proxy", () => {

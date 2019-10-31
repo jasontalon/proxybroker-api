@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const express = require("express"),
 	app = express(),
 	port = process.env.PORT || 8080,
@@ -11,7 +9,7 @@ app.set("json spaces", 2);
 
 let lastRunAt = "",
 	proxies = [];
-	
+
 app.get("/", async function(req, res) {
 	res.jsonp({ lastRunAt, proxies });
 });
