@@ -1,5 +1,5 @@
 # proxybroker-api
-A simple REST API for proxybroker
+A simple REST API for [ProxyBroker](https://github.com/constverum/ProxyBroker)
 
 ## Motivation
 
