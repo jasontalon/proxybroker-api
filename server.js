@@ -1,37 +1,33 @@
 const express = require("express"),
-	app = express(),
-	port = process.env.PORT || 8080,
-	proxyGetLimit = process.env.PROXY_GET_LIMIT || 15,
-	proxyTargetCountries = process.env.PROXY_COUNTRIES || "US",
-	CronJob = require("cron").CronJob,
-	{ findProxy } = require("./proxy.find"),
-	findProxyJob = new CronJob("0 */1 * * * *", findProxyCommand), //runs every minute
-	util = require("util");
+  app = express(),
+  port = process.env.PORT || 8080,
+  { PROXY_GET_LIMIT = 10, PROXY_COUNTRIES = "US" } = process.env,
+  { findProxy } = require("./proxy.find");
 
 app.set("json spaces", 2);
+app.use(express.json());
 
-let lastRefreshAt = "",
-	proxies = [];
-
-app.get("/", async function(req, res) {
-	res.jsonp({ lastRunAt: lastRefreshAt, proxies });
+const removeStackProperty = obj =>
+  Object.getOwnPropertyNames(obj).reduce((acc, key) => {
+    if (key.toLowerCase() !== "stack") {
+      acc[key] = obj[key];
+      return acc;
+    } else return acc;
+  }, {});
+app.get("/", async (req, res) => {
+  try {
+    res.setTimeout(20000, () => {
+      res.status(408).send("Request Timeout");
+    });
+    const proxies = await findProxy({
+      countries: (req.query.countries || PROXY_COUNTRIES).replace(/,/gm, " "),
+      limit: req.query.limit || PROXY_GET_LIMIT
+    });
+    res.jsonp(proxies);
+  } catch (err) {
+    res.status(500).jsonp(removeStackProperty(err));
+  }
 });
-
-app.get("/refresh", async function(req, res) {
-	try {
-		await findProxyCommand();
-		res.jsonp({ lastRunAt: lastRefreshAt, proxies });
-	} catch (error) {
-		res.status(500).send({ error: util.inspect(error) });
-	}
-});
-
 app.listen(port, () => {
-	console.log(`listening to port ${port}`);
-	findProxyJob.start();
+  console.log(`listening to port ${port}`);
 });
-
-async function findProxyCommand() {
-	proxies = await findProxy(proxyTargetCountries, proxyGetLimit);
-	lastRefreshAt = new Date();
-}
