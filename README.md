@@ -45,7 +45,7 @@ This API uses a number of components to work properly:
  ```
  curl -X GET 'http://localhost:8080/?countries=US,CA&limit=5'
  ```
- Above example requests a bunch of IP proxy addresses from United States, and Canada. Limited only to 5 IP Proxy addresses.
+ Above example is requesting a bunch of IP proxy addresses from United States, and Canada. Limited only to 5 IP Proxy addresses.
  
  The output of the API is in JSON format.
  ```
