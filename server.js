@@ -1,33 +1,46 @@
+require("dotenv").config();
+
 const express = require("express"),
   app = express(),
-  port = process.env.PORT || 8080,
-  { PROXY_GET_LIMIT = 10, PROXY_COUNTRIES = "US" } = process.env,
-  { findProxy } = require("./proxy.find");
+  PORT = process.env.PORT || 8080,
+  PROXY_TARGET_COUNTRIES = process.env.PROXY_TARGET_COUNTRIES || "US",
+  routes = require("./routes"),
+  Queue = require("promise-queue"),
+  { CronJob } = require("cron"),
+  proxy = require("./modules/proxy"),
+  { pingThenInspectIp } = require("./services/proxy"),
+  db = require("./modules/db"),
+  queue = new Queue(2, 100);
+
+db.createDbIfNotExists();
 
 app.set("json spaces", 2);
 app.use(express.json());
 
-const removeStackProperty = obj =>
-  Object.getOwnPropertyNames(obj).reduce((acc, key) => {
-    if (key.toLowerCase() !== "stack") {
-      acc[key] = obj[key];
-      return acc;
-    } else return acc;
-  }, {});
-app.get("/", async (req, res) => {
-  try {
-    res.setTimeout(20000, () => {
-      res.status(408).send("Request Timeout");
-    });
-    const proxies = await findProxy({
-      countries: (req.query.countries || PROXY_COUNTRIES).replace(/,/gm, " "),
-      limit: req.query.limit || PROXY_GET_LIMIT
-    });
-    res.jsonp(proxies);
-  } catch (err) {
-    res.status(500).jsonp(removeStackProperty(err));
-  }
+routes(app);
+
+app.listen(PORT || 8080, () => {
+  console.log(`listening to port ${PORT}`);
+  const findProxyJob = new CronJob("0 */5 * * * *", findProxyTask);
+
+  findProxyJob.start();
 });
-app.listen(port, () => {
-  console.log(`listening to port ${port}`);
-});
+
+async function findProxyTask() {
+  const proxies = await proxy.findProxy({ countries: PROXY_TARGET_COUNTRIES });
+
+  proxies
+    .map(proxy => `${proxy.ip}:${proxy.port}`)
+    .forEach(addProxyInspectionToQueue);
+}
+
+async function addProxyInspectionToQueue(proxy) {
+  queue.add(async () => {
+    const proxyDetails = await pingThenInspectIp({
+      proxy,
+      siteCount: 2
+    });
+
+    await db.add(proxy, JSON.stringify(proxyDetails));
+  });
+}

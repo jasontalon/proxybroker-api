@@ -44,7 +44,7 @@ function proxyBrokerResponse({ error, stdout, stderr }, { resolve, reject }) {
   }
 }
 
-async function findProxy({ countries = "US", limit = 15 }) {
+async function findProxy({ countries, limit = 15 }) {
   return new Promise((resolve, reject) => {
     exec(
       buildCommand(proxyBrokerDirectory, countries, limit),
@@ -54,4 +54,4 @@ async function findProxy({ countries = "US", limit = 15 }) {
   });
 }
 
-module.exports = { findProxy };
+module.exports = findProxy;
