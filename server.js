@@ -10,7 +10,9 @@ const express = require("express"),
   proxy = require("./modules/proxy"),
   { pingThenInspectIp } = require("./services/proxy"),
   db = require("./modules/db"),
-  queue = new Queue(2, 100);
+  queue = new Queue(1, 100),
+  moment = require("moment"),
+  _ = require("lodash");
 
 db.createDbIfNotExists();
 
@@ -19,28 +21,39 @@ app.use(express.json());
 
 routes(app);
 
-app.listen(PORT || 8080, () => {
+app.listen(PORT, () => {
   console.log(`listening to port ${PORT}`);
-  const findProxyJob = new CronJob("0 */5 * * * *", findProxyTask);
-
-  findProxyJob.start();
+  const findGoodProxyJob = new CronJob("0 */1 * * * *", findGoodProxyTask);
+  const deleteOldProxyJob = new CronJob("0 */60 * * * *", deleteOldProxyTask);
+  findGoodProxyJob.start();
+  deleteOldProxyJob.start();
 });
 
-async function findProxyTask() {
+async function deleteOldProxyTask() {}
+
+async function findGoodProxyTask() {
   const proxies = await proxy.findProxy({ countries: PROXY_TARGET_COUNTRIES });
 
   proxies
     .map(proxy => `${proxy.ip}:${proxy.port}`)
     .forEach(addProxyInspectionToQueue);
+
+  console.log(
+    `${moment().toISOString()} ${
+      proxies.length
+    } proxies placed on queue for processing.`
+  );
 }
 
 async function addProxyInspectionToQueue(proxy) {
   queue.add(async () => {
-    const proxyDetails = await pingThenInspectIp({
-      proxy,
-      siteCount: 2
-    });
+    const proxyDetails = await pingThenInspectIp(proxy);
 
-    await db.add(proxy, JSON.stringify(proxyDetails));
+    const { errorCount, blockedByCloudflare } = proxyDetails.findings;
+
+    if (errorCount == 0 && !blockedByCloudflare) {
+      await db.add(proxy, JSON.stringify(proxyDetails));
+      console.log(`${moment().toISOString()} ${proxy} added`);
+    }
   });
 }

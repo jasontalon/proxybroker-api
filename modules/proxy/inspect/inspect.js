@@ -25,7 +25,7 @@ module.exports = {
 
   inspectPage: async function(proxy, context) {
     const code =
-      'module.exports=async({page,context})=>{const{timeout=30000,width=1366,height=768,isMobile=!1,targetSite="",waitUntil="load"}=context;page.setDefaultTimeout(timeout);await page.setViewport({width,height,isMobile});await page.goto(targetSite,{waitUntil});const data=await page.$eval("body",el=>el.innerText);return{data,type:"text/plain"}}';
+      'module.exports=async({page,context})=>{const{timeout=30000,width=1366,height=768,isMobile=!1,targetSite="",waitUntil="load"}=context;page.setDefaultTimeout(timeout);await page.setViewport({width,height,isMobile});await page.goto(targetSite,{waitUntil});const data={title: await page.title(),body : await page.$eval("body",el=>el.innerText)};return{data,type:"application/json"}}';
 
     const data = await browserlessFunction({ proxy, code, context });
 

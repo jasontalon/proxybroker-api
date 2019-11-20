@@ -1,7 +1,8 @@
 const ping = require("../../modules/proxy/ping"),
   { inspectIp } = require("../../modules/proxy/inspect"),
   { getDuration, cleanErrorResponse } = require("../..//helpers"),
-  moment = require("moment");
+  moment = require("moment"),
+  _ = require("lodash");
 
 async function doInspectIp(proxy) {
   try {
@@ -14,20 +15,30 @@ async function doInspectIp(proxy) {
   }
 }
 
-async function pingThenInspectIp({ proxy, siteCount }) {
+async function pingThenInspectIp(proxy) {
   const startTime = moment(),
-    pingedSites = await ping({ proxy, siteCount }),
+    pingedSites = await ping(proxy),
     ipDetails = await doInspectIp(proxy);
 
   const result = {
     ipDetails,
     pingedSites,
-    requestDuration: getDuration(startTime)
+    requestDuration: getDuration(startTime),
+    findings: { ...evaluateInspection(ipDetails, pingedSites) }
   };
 
   return result;
 }
 
+function evaluateInspection(ipDetails, pingedSites) {
+  const pingedSitesTitles = _.map(pingedSites, "title").join("||"),
+    blockedByCloudflare = /(access denied|attention required)/gim.test(
+      pingedSitesTitles
+    ),
+    errors = [ipDetails.error, ..._.map(pingedSites, "error")].filter(p => p);
+
+  return { errors, blockedByCloudflare };
+}
 module.exports = {
   pingThenInspectIp
 };

@@ -16,7 +16,7 @@ async function pingSite(targetSite, res) {
       width: 750,
       height: 1334
     });
-    res({ pingDuration: getDuration(startTime), hostName, data });
+    res({ pingDuration: getDuration(startTime), hostName, ...data });
   } catch (error) {
     res({
       pingDuration: getDuration(startTime),
@@ -38,27 +38,32 @@ function createRandomPingPromise(value, index) {
 
   this.promises.push(promise);
 }
-const pingSites = async ({ proxy, siteCount = 3 }) => {
+const pingSites = async (proxy) => {
   const sites = [
+    "https://www.duckduckgo.com/",
     "https://www.opendns.com/",
-    "https://www.google.com/",
     "https://www.facebook.com/",
     "https://www.godaddy.com/",
     "https://www.namecheap.com/",
-    "https://www.socialblade.com/"
+    "https://whatismyipaddress.com/blacklist-check"
   ];
-
-  const randomNumbers = getRandomUniqueNumbers(siteCount, sites.length);
   const promises = [];
 
-  [...new Array(siteCount)].forEach(createRandomPingPromise, {
-    promises,
-    proxy,
-    sites,
-    randomNumbers
-  });
+  /*if (siteCount) {
+    const randomNumbers = getRandomUniqueNumbers(siteCount, sites.length);
 
-  promises.push(pingSitePromise("https://www.cloudflare.com/"));//check proxy if it is blocked by cloudflare
+    [...new Array(siteCount)].forEach(createRandomPingPromise, {
+      promises,
+      proxy,
+      sites,
+      randomNumbers
+    });
+  }*/
+
+  promises.push(
+    pingSitePromise("https://whatismyipaddress.com/blacklist-check")
+  );
+  promises.push(pingSitePromise("https://www.socialblade.com/"));
 
   const results = await Promise.all(promises);
 

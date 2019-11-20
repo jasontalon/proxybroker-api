@@ -18,8 +18,7 @@ const GET = [
         res.status(500).jsonp(removeStackProperty(err));
       }
     }
-  ],
-  ["/inspected", function(req, res) {}] //TODO
+  ]
 ];
 
 function route(app) {

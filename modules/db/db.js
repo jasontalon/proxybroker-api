@@ -29,7 +29,7 @@ module.exports = function() {
         );
       });
     },
-    get: async function() {
+    get: async function(limit = 100) {
       return await sequelize.query("SELECT * FROM proxy", {
         type: Sequelize.QueryTypes.SELECT
       });
