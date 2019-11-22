@@ -1,1 +1,1 @@
-module.exports = require("./ping");
+module.exports = require("./proxy.ping");

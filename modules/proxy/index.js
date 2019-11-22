@@ -1,5 +1,5 @@
 module.exports = {
-  findProxy: require("./find"),
-  ...require("./inspect"),
-  pingSites: require("./ping")
+  search: require("./search"),
+  inspect: require("./eval"),
+  ping: require("./ping")
 };

@@ -1,6 +1,6 @@
-const { PROXY_GET_LIMIT = 10, PROXY_COUNTRIES = "US" } = process.env;
-const { removeStackProperty } = require("../helpers");
-const findProxy = require("../modules/proxy/find");
+const { PROXY_TARGET_COUNTRIES = "US" } = process.env;
+const { removeStackProperty } = require("../util");
+const findProxy = require("../modules/proxy/search");
 
 const GET = [
   [
@@ -10,8 +10,8 @@ const GET = [
       try {
         res.setTimeout(30000, () => res.status(408).send("Request Timeout"));
         const proxies = await findProxy({
-          countries: (countries || PROXY_COUNTRIES).replace(/,/gm, " "),
-          limit: limit || PROXY_GET_LIMIT
+          countries: (countries || PROXY_TARGET_COUNTRIES).replace(/,/gm, " "),
+          limit: limit || 10
         });
         res.jsonp(proxies);
       } catch (err) {

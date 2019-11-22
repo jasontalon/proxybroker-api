@@ -22,11 +22,14 @@ const parseProxyBrokerResponseItem = row => ({
     ...splitIpAndPort(extractIpAndPort(row)),
     summary: row.replace(/(\r|<|Proxy |>|\d{1,2}.\d{1,2}s )/gm, "")
   }),
-  buildCommand = (proxyBrokerDirectory, countries, limit) =>
-    `${path.join(
+  buildCommand = (proxyBrokerDirectory, countries, limit) => {
+    let countryParameter = "";
+    if (countries) countryParameter = `--countries ${countries}`;
+    return `${path.join(
       proxyBrokerDirectory,
       "proxybroker"
-    )} find --types HTTPS --lvl High --countries ${countries} --strict -l ${limit}`;
+    )} find --types HTTPS --lvl High ${countryParameter} --strict -l ${limit}`;
+  };
 
 function parseProxyBrokerResponseItems(item) {
   this.push(parseProxyBrokerResponseItem(item));

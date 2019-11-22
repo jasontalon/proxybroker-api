@@ -1,3 +1,3 @@
 module.exports = {
-  ...require("./ping.inspect")
+  inspector: require("./proxy.inspect")
 };

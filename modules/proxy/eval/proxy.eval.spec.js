@@ -1,5 +1,5 @@
 require("dotenv").config();
-const inspect = require("./inspect");
+const evaluate = require("./proxy.eval");
 
 describe("test", () => {
   it.each([
@@ -9,7 +9,7 @@ describe("test", () => {
   ])(
     "should inpect proxy %s",
     async (proxy, shouldExpect) => {
-      const data = await inspect.inspectIp(proxy);
+      const data = await evaluate(proxy).ip();
       if (shouldExpect) expect(data).toEqual(expect.anything());
       else expect(data).not.toEqual(expect.anything());
 
@@ -24,8 +24,8 @@ describe("test", () => {
     ["https://fb.com/", "108.160.129.219:8080", true]
   ])(
     "should inspect page %s with proxy %s",
-    async (targetSite, proxy, shouldExpect) => {
-      const data = await inspect.inspectPage(proxy, { targetSite });
+    async (url, proxy, shouldExpect) => {
+      const data = await evaluate(proxy).page({ url });
       if (shouldExpect) expect(data).toEqual(expect.anything());
       else expect(data).not.toEqual(expect.anything());
 

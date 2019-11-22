@@ -1,20 +1,13 @@
 require("dotenv").config();
 
-const express = require("express"),
-  app = express(),
-  PORT = process.env.PORT || 8080,
-  PROXY_TARGET_COUNTRIES = process.env.PROXY_TARGET_COUNTRIES || "US",
-  routes = require("./routes"),
-  Queue = require("promise-queue"),
+const { PORT = 8080, PROXY_TARGET_COUNTRIES = "US" } = process.env,
   { CronJob } = require("cron"),
-  proxy = require("./modules/proxy"),
-  { pingThenInspectIp } = require("./services/proxy"),
-  db = require("./modules/db"),
-  queue = new Queue(1, 100),
-  moment = require("moment"),
-  _ = require("lodash");
-
-db.createDbIfNotExists();
+  express = require("express"),
+  app = express(),
+  routes = require("./routes"),
+  proxybroker = require("./modules/proxy/search"),
+  { save } = require("./modules/db"),
+  { inspector } = require("./services/proxy");
 
 app.set("json spaces", 2);
 app.use(express.json());
@@ -23,37 +16,35 @@ routes(app);
 
 app.listen(PORT, () => {
   console.log(`listening to port ${PORT}`);
-  const findGoodProxyJob = new CronJob("0 */1 * * * *", findGoodProxyTask);
-  const deleteOldProxyJob = new CronJob("0 */60 * * * *", deleteOldProxyTask);
+  const findGoodProxyJob = new CronJob("0 */10 * * * *", findGoodProxyTask);
   findGoodProxyJob.start();
-  deleteOldProxyJob.start();
 });
 
-async function deleteOldProxyTask() {}
-
 async function findGoodProxyTask() {
-  const proxies = await proxy.findProxy({ countries: PROXY_TARGET_COUNTRIES });
+  console.log("find proxies...");
 
-  proxies
-    .map(proxy => `${proxy.ip}:${proxy.port}`)
-    .forEach(addProxyInspectionToQueue);
-
-  console.log(
-    `${moment().toISOString()} ${
-      proxies.length
-    } proxies placed on queue for processing.`
-  );
-}
-
-async function addProxyInspectionToQueue(proxy) {
-  queue.add(async () => {
-    const proxyDetails = await pingThenInspectIp(proxy);
-
-    const { errorCount, blockedByCloudflare } = proxyDetails.findings;
-
-    if (errorCount == 0 && !blockedByCloudflare) {
-      await db.add(proxy, JSON.stringify(proxyDetails));
-      console.log(`${moment().toISOString()} ${proxy} added`);
-    }
+  const response = await proxybroker({
+    countries: PROXY_TARGET_COUNTRIES,
+    limit: 10
   });
+
+  const proxies = response.map(proxy => `${proxy.ip}:${proxy.port}`),
+    sitesToPing = ["https://cloudflare.com/"];
+
+  for (let i = 0; i < proxies.length; i++) {
+    const proxy = proxies[i],
+      { results } = await (
+        await (await inspector(proxy).lookupIp()).pingSites(sitesToPing)
+      ).evaluate();
+    const {
+      evaluation: { errors, blocked }
+    } = results;
+
+    if (errors.length == 0 && !blocked) {
+      await save(proxy); //good proxy.
+      console.log(`good proxy ->${proxy}`);
+    } else {
+      console.log(`bad proxy ->${proxy}`);
+    }
+  }
 }
