@@ -25,6 +25,5 @@ describe("proxy inspector", () => {
       p => p.evaluation.errors.length == 0 && !p.evaluation.blocked
     );
     expect(items).toEqual(expect.anything());
-    debugger;
   }, 150000);
 });
