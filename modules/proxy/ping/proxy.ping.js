@@ -4,6 +4,7 @@ const moment = require("moment"),
 
 async function pingSite(proxy, url, resolve) {
   const startTime = moment();
+
   try {
     const data = await evaluate(proxy).page({ url });
     resolve({ duration: getDuration(startTime), url, ...data });
@@ -15,6 +16,7 @@ async function pingSite(proxy, url, resolve) {
     });
   }
 }
+
 function ping(url) {
   return new Promise(async resolve => {
     await pingSite(this.proxy, url, resolve);

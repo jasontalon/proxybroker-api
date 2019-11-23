@@ -2,13 +2,16 @@ const _ = require("lodash"),
   proxyCheck = require("../../modules/proxy"),
   moment = require("moment"),
   { getDuration, cleanErrorResponse } = require("../../util");
-module.exports = function(proxy = "") {
+
+module.exports = async function(proxy = "") {
   const inspector = {
     results: { proxy, ip: {}, pings: [], evaluation: {} },
+
     pingSites: async function(urls) {
       this.results.pings.push(...(await proxyCheck.ping({ proxy, urls })));
       return this;
     },
+
     lookupIp: async function() {
       try {
         const startTime = moment().toISOString();
@@ -23,6 +26,7 @@ module.exports = function(proxy = "") {
         return this;
       }
     },
+
     evaluate: function() {
       const titles = _.map(this.results.pings, "title").join("||"),
         blocked = /(access denied|attention required|restrict)/gim.test(titles),
@@ -34,5 +38,6 @@ module.exports = function(proxy = "") {
       return this;
     }
   };
+
   return inspector;
 };

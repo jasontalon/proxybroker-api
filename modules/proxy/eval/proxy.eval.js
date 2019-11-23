@@ -5,6 +5,7 @@ async function browserlessFunction({ code, context = {}, proxy = "" }) {
   let queryString = `?--no-sandbox&--disable-setuid-sandbox&--lang=en`;
   if (proxy) queryString += "&--proxy-server=" + proxy;
   if (BROWSERLESS_TOKEN) queryString += "&token=" + BROWSERLESS_TOKEN;
+  
   const url = BROWSERLESS_ENDPOINT + "/function" + queryString;
 
   const { data } = await axios.post(url, {
