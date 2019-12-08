@@ -8,7 +8,7 @@ const GET = [
     async function(req, res) {
       const { countries, limit } = req.query;
       try {
-        res.setTimeout(30000, () => res.status(408).send("Request Timeout"));
+        res.setTimeout(130000, () => res.status(408).send("Request Timeout"));
         const proxies = await findProxy({
           countries: (countries || PROXY_TARGET_COUNTRIES).replace(/,/gm, " "),
           limit: limit || 10
