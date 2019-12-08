@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const { PORT = 8080 } = process.env,
   express = require("express"),
   app = express(),

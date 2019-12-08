@@ -1,5 +1,3 @@
-const moment = require("moment");
-
 const tryGetHttpResponseError = err => {
   const { response: { data, statusText } = {} } = err;
   return { data, statusText };
@@ -19,9 +17,6 @@ const cleanErrorResponse = err =>
 const sendErrorResponse = (res, err) =>
   res.status(400).send(cleanErrorResponse(err));
 
-const getDuration = startTime =>
-  moment.duration(moment().diff(startTime)).asSeconds() + "s";
-
 const getRandomIndex = max => Math.floor(Math.random() * Math.floor(max));
 
 const getRandomUniqueNumbers = (length, maxRandomNumbers) =>
@@ -38,6 +33,5 @@ module.exports = {
   removeStackProperty,
   cleanErrorResponse,
   tryGetHttpResponseError,
-  getDuration,
   getRandomUniqueNumbers
 };

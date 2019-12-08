@@ -1,6 +1,5 @@
 const { exec } = require("child_process"),
-  path = require("path"),
-  proxyBrokerDirectory = process.env.PROXYBROKER_DIRECTORY || "";
+  path = require("path");
 
 function extractIpAndPort(output) {
   return (
@@ -22,11 +21,10 @@ const parseProxyBrokerResponseItem = row => ({
     ...splitIpAndPort(extractIpAndPort(row)),
     summary: row.replace(/(\r|<|Proxy |>|\d{1,2}.\d{1,2}s )/gm, "")
   }),
-  buildCommand = (proxyBrokerDirectory, countries, limit) => {
+  buildCommand = (countries, limit) => {
     let countryParameter = "";
     if (countries) countryParameter = `--countries ${countries}`;
     return `${path.join(
-      proxyBrokerDirectory,
       "proxybroker"
     )} find --types HTTPS --lvl High ${countryParameter} --strict -l ${limit}`;
   };
@@ -50,7 +48,7 @@ function proxyBrokerResponse({ error, stdout, stderr }, { resolve, reject }) {
 async function findProxy({ countries, limit = 10 }) {
   return new Promise((resolve, reject) => {
     exec(
-      buildCommand(proxyBrokerDirectory, countries, limit),
+      buildCommand(countries, limit),
       (error, stdout, stderr) =>
         proxyBrokerResponse({ error, stdout, stderr }, { resolve, reject })
     );
