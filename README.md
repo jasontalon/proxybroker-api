@@ -50,29 +50,64 @@ Sample output:
 ```
  [
   {
-    "ip": "69.15.2.22",
+    "fullAddress": "157.245.124.217:3128",
+    "ip": "157.245.124.217",
+    "port": "3128",
+    "summary": "<Proxy US 0.98s [HTTP: Transparent, HTTPS] 157.245.124.217:3128>\r"
+  },
+  {
+    "fullAddress": "34.90.113.143:3128",
+    "ip": "34.90.113.143",
+    "port": "3128",
+    "summary": "<Proxy US 0.72s [HTTP: Transparent, HTTPS] 34.90.113.143:3128>\r"
+  },
+  {
+    "fullAddress": "50.195.157.73:8080",
+    "ip": "50.195.157.73",
     "port": "8080",
-    "summary": "US [HTTPS] 69.15.2.22:8080"
+    "summary": "<Proxy US 0.78s [HTTPS] 50.195.157.73:8080>\r"
   },
   {
-    "ip": "66.7.113.39",
-    "port": "3128",
-    "summary": "US [HTTPS] 66.7.113.39:3128"
+    "fullAddress": "50.195.185.171:8080",
+    "ip": "50.195.185.171",
+    "port": "8080",
+    "summary": "<Proxy US 0.92s [HTTP: Transparent, HTTPS] 50.195.185.171:8080>\r"
   },
   {
-    "ip": "149.56.133.81",
-    "port": "3128",
-    "summary": "CA [HTTPS] 149.56.133.81:3128"
+    "fullAddress": "159.89.138.73:80",
+    "ip": "159.89.138.73",
+    "port": "80",
+    "summary": "<Proxy US 0.38s [HTTPS] 159.89.138.73:80>\r"
   },
   {
-    "ip": "149.56.106.104",
+    "fullAddress": "23.237.173.102:3128",
+    "ip": "23.237.173.102",
     "port": "3128",
-    "summary": "CA [HTTPS] 149.56.106.104:3128"
+    "summary": "<Proxy US 0.94s [HTTP: Transparent, HTTPS] 23.237.173.102:3128>\r"
   },
   {
-    "ip": "198.199.85.139",
-    "port": "3128",
-    "summary": "US [HTTPS] 198.199.85.139:3128"
+    "fullAddress": "50.195.185.132:8080",
+    "ip": "50.195.185.132",
+    "port": "8080",
+    "summary": "<Proxy US 0.95s [HTTP: Transparent] 50.195.185.132:8080>\r"
+  },
+  {
+    "fullAddress": "66.90.255.99:8080",
+    "ip": "66.90.255.99",
+    "port": "8080",
+    "summary": "<Proxy US 0.50s [HTTPS] 66.90.255.99:8080>\r"
+  },
+  {
+    "fullAddress": "132.148.241.241:8888",
+    "ip": "132.148.241.241",
+    "port": "8888",
+    "summary": "<Proxy US 1.78s [HTTP: Transparent, HTTPS] 132.148.241.241:8888>\r"
+  },
+  {
+    "fullAddress": "172.93.199.90:3131",
+    "ip": "172.93.199.90",
+    "port": "3131",
+    "summary": "<Proxy US 0.52s [HTTP: Transparent, HTTPS] 172.93.199.90:3131>\r"
   }
 ]
  ```
