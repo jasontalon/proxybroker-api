@@ -3,9 +3,9 @@ A simple REST API for [ProxyBroker](https://github.com/constverum/ProxyBroker)
 
 ## Motivation
 
-I was looking for free proxy IP addresses over the Internet and I was able to find a CLI utility called [ProxyBroker](https://github.com/constverum/ProxyBroker) which created with python.
+I was looking for free proxy server IP addresses over the Internet and I was able to find a CLI utility called [ProxyBroker](https://github.com/constverum/ProxyBroker) which created with python.
 
-I created this REST API to easily fetch the output from proxybroker instead of extending the proxybroker app.
+I created this REST API to easily fetch the output from proxybroker instead of extending the proxybroker utility.
 
 ## Requirements
 
@@ -28,12 +28,9 @@ This API uses a number of components to work properly:
  ```
  npm i
  ```
- 3. (Optional) Create your .env file in the root development directory for default values
+ 3. Transpile Typescript
  ```
- PORT=<number, defaults to 8080>
- PROXY_GET_LIMIT=<number, defaults to 10>
- PROXY_COUNTRIES=<2 letter country code, defaults to US>
- PROXYBROKER_DIRECTORY=<directory proxybroker.exe, leave this blank assuming the proxybroker directory is present in environment variable path>
+ npm run tsc
  ```
  4. Start the API Service.
  ```
@@ -48,7 +45,9 @@ This API uses a number of components to work properly:
  Above example is requesting a bunch of IP proxy addresses from United States, and Canada. Limited only to 5 IP Proxy addresses.
  
  The output of the API is in JSON format.
- ```
+ 
+Sample output:
+```
  [
   {
     "ip": "69.15.2.22",
