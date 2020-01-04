@@ -6,51 +6,52 @@ export default class RouteBuilder {
 
   private getRoutes(): Route[] {
     const routes: Route[] = [
-      {
-        httpMethod: "get",
-        path: "/search",
-        handler: async function(request: Request, response: Response) {
-          const emptyString = "",
-            notEmpty = (value: string) => !!value,
-            {
-              countries = emptyString,
-              types = emptyString,
-              lvl = emptyString,
-              limit = 10,
-              strict = false
-            } = request.query;
+      new Route("get", "/search", async function(
+        request: Request,
+        response: Response
+      ) {
+        const emptyString = "",
+          {
+            countries = emptyString,
+            types = emptyString,
+            lvl = emptyString,
+            limit = 10,
+            strict = false
+          } = request.query;
 
-          if ([types, lvl].includes(emptyString)) {
-            response
-              .status(400)
-              .send(
-                "specify types=[HTTP, HTTPS, SOCKS4, SOCKS5, CONNECT:80, CONNECT25], lvl=[Transparent, Anonymous, High] parameters"
-              );
-            return;
-          }
-          try {
-            const asProxyType = (type: string) => type as ProxyType,
-              asLevel = (level: string) => level as Level,
-              proxies = await new ProxyBroker({
-                countries: (countries as string).split(",").filter(p => p),
-                types: (types as string)
-                  .split(",")
-                  .map(asProxyType)
-                  .filter(notEmpty),
-                lvl: (lvl as string)
-                  .split(",")
-                  .map(asLevel)
-                  .filter(notEmpty),
-                limit,
-                strict
-              }).search();
-
-            response.jsonp(proxies.map(Format));
-          } catch (err) {
-            response.status(400).send(err);
-          }
+        if ([types, lvl].includes(emptyString)) {
+          response.status(400).jsonp({
+            message:
+              "specify following parameters: types=[HTTP, HTTPS, SOCKS4, SOCKS5, CONNECT:80, CONNECT25], lvl=[Transparent, Anonymous, High]"
+          });
+          return;
         }
-      }
+        try {
+          const notEmpty = (value: string) => !!value,
+            asProxyType = (type: string) => type as ProxyType,
+            asLevel = (level: string) => level as Level,
+            commaSeperated: string = ",",
+            proxies = await new ProxyBroker({
+              countries: (countries as string)
+                .split(commaSeperated)
+                .filter(notEmpty),
+              types: (types as string)
+                .split(commaSeperated)
+                .map(asProxyType)
+                .filter(notEmpty),
+              lvl: (lvl as string)
+                .split(commaSeperated)
+                .map(asLevel)
+                .filter(notEmpty),
+              limit,
+              strict
+            }).search();
+
+          response.jsonp(proxies.map(Format));
+        } catch (err) {
+          response.status(400).send(err);
+        }
+      })
     ];
     return routes;
   }
@@ -64,8 +65,13 @@ export default class RouteBuilder {
   }
 }
 
-export interface Route {
-  httpMethod: "post" | "get" | "put";
-  path: string;
-  handler: (request: Request, response: Response) => void;
+export class Route {
+  constructor(
+    public httpMethod: HttpMethod,
+    public path: string,
+    public handler: Handler
+  ) {}
 }
+
+export type HttpMethod = "post" | "get" | "put";
+type Handler = (request: Request, response: Response) => void;
