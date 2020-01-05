@@ -1,13 +1,10 @@
-import express from "express";
-import RouteBuilder from "./routes";
-const { PORT = 8080 } = process.env,
-  app = express();
+import fastify from "fastify";
+import routes from "./routes";
+const app = fastify(),
+  { PORT = 8080 } = process.env;
 
-app.set("json spaces", 2);
-app.use(express.json());
+app.register(routes);
 
-new RouteBuilder(app).setup();
-
-app.listen(PORT, () => {
+app.listen(PORT as number, () => {
   console.log(`listening to port ${PORT}`);
 });
