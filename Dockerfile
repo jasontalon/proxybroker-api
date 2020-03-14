@@ -1,17 +1,11 @@
 FROM nikolaik/python-nodejs:python3.7-nodejs12
 
-RUN pip install proxybroker
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY . ./
 
-COPY package*.json ./
-
-RUN npm install
-
-COPY . /usr/src/app
-
-RUN npm run tsc
-
-EXPOSE 8080
+RUN pip install proxybroker && \
+npm install && \
+npm run tsc
 
 CMD [ "npm", "start" ]

@@ -5,6 +5,6 @@ const app = fastify(),
 
 app.register(routes);
 
-app.listen(PORT as number, () => {
+app.listen(PORT as number, "0.0.0.0", () => {
   console.log(`listening to port ${PORT}`);
 });
